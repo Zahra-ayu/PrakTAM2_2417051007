@@ -57,7 +57,8 @@ fun Greeting() {
             modifier = Modifier
                 .padding(16.dp)
         )
-        Card(modifier = Modifier.size(350.dp, 125.dp),) {
+
+        Card(modifier = Modifier.size(350.dp, 125.dp)) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Row() {
                     Text(text = "\uD83D\uDCCD Lokasi: ")
