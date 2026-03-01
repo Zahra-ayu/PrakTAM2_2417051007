@@ -67,7 +67,7 @@ fun Greeting() {
 
                 Row() {
                     Text(text = "\uD83D\uDCB0 Tiket: ")
-                    Text(text = "Rp ${wisata.harga_tiket_awal} - ${wisata.harga_tiket_akhir}")
+                    Text(text = "Rp ${wisata.hargaTiketAwal} - ${wisata.hargaTiketAkhir}")
                 }
             }
         }
