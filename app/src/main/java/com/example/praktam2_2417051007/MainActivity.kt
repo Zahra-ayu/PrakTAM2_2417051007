@@ -45,14 +45,14 @@ fun DaftarWisataScreen(){
         .padding(24.dp)
     ) {
         WisataSource.dummyWisata.forEach { wisata ->
-            DetaiScreen(wisata = wisata)
+            DetailScreen(wisata = wisata)
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
 
 @Composable
-fun DetaiScreen(wisata: Wisata){
+fun DetailScreen(wisata: Wisata){
     Column(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = wisata.imageRes),
@@ -68,6 +68,12 @@ fun DetaiScreen(wisata: Wisata){
             text = wisata.nama,
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = wisata.deskripsi,
+            style = MaterialTheme.typography.bodyLarge
         )
         Spacer(modifier = Modifier.height(8.dp))
 
