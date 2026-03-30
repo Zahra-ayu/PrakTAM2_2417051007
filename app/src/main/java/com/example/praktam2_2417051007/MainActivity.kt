@@ -104,7 +104,10 @@ fun WisataRowItem(wisata: Wisata) {
     Card(
         modifier = Modifier.width(160.dp),
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
         Column {
             Image(
@@ -118,12 +121,12 @@ fun WisataRowItem(wisata: Wisata) {
             Column(modifier = Modifier.padding(8.dp)) {
                 Text(
                     text = wisata.nama,
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = "Rp ${wisata.hargaTiketAwal} - ${wisata.hargaTiketAkhir}",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
             }
@@ -216,47 +219,6 @@ fun DetailScreen(wisata: Wisata){
         }
     }
 }
-//fun Greeting() {
-//    val wisata = WisataSource.dummyWisata[0]
-//
-//    Column(modifier = Modifier.fillMaxSize().padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-//        Image(
-//            painter = painterResource(id = wisata.imageRes),
-//            contentDescription = wisata.nama,
-//            modifier = Modifier.size(300.dp, 200.dp),
-//            contentScale = ContentScale.Crop
-//        )
-//        Text(text = wisata.nama,
-//            fontSize = 24.sp,
-//            fontWeight = FontWeight.Bold,
-//            textAlign = TextAlign.Center,
-//            modifier = Modifier
-//                .padding(16.dp)
-//        )
-//
-//        Card(modifier = Modifier.size(350.dp, 125.dp)) {
-//            Column(modifier = Modifier.padding(16.dp)) {
-//                Row() {
-//                    Text(text = "\uD83D\uDCCD Lokasi: ")
-//                    Text(text = wisata.lokasi)
-//                }
-//
-//                Row() {
-//                    Text(text = "\uD83D\uDCB0 Tiket: ")
-//                    Text(text = "Rp ${wisata.hargaTiketAwal} - ${wisata.hargaTiketAkhir}")
-//                }
-//            }
-//        }
-//
-//        Text(text = wisata.deskripsi,
-//            color = Color(0xFFC0C2C9),
-//            textAlign = TextAlign.Justify,
-//            modifier = Modifier
-//                .padding(top = 16.dp))
-//
-//
-//    }
-//}
 
 @Preview(showBackground = true)
 @Composable
