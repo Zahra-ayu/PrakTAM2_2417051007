@@ -3,7 +3,6 @@ package com.example.praktam2_2417051007
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,14 +53,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.draw.clip
+import com.example.praktam2_2417051007.network.RetrofitClient
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.praktam2_2417051007.ui.theme.PrakTAM2_2417051007Theme
-import model.Wisata
-import model.WisataSource
+import com.example.praktam2_2417051007.model.Wisata
+import coil.compose.AsyncImage
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,19 +79,22 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
+    var wisataa by remember { mutableStateOf<List<Wisata>>(emptyList()) }
+
     NavHost(
         navController = navController,
         startDestination = "home"
     ) {
 
         composable("home") {
-            DaftarWisataScreen(navController)
+            DaftarWisataScreen(navController) { fetchedWisata ->
+                wisataa = fetchedWisata
+            }
         }
 
         composable("detail/{nama}") { backStackEntry ->
-            val nama =
-                backStackEntry.arguments?.getString("nama")
-            val wisata = WisataSource.dummyWisata.find {
+            val nama = backStackEntry.arguments?.getString("nama")
+            val wisata = wisataa.find {
                 it.nama == nama
             }
             if (wisata != null) {
@@ -98,47 +103,100 @@ fun AppNavigation(navController: NavHostController) {
         }
     }
 }
+
 @Composable
-fun DaftarWisataScreen(navController: NavController){
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding(),
-        contentPadding = PaddingValues(24.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
-        item {
-            Text(
-                text = "Rekomendasi Populer",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+fun DaftarWisataScreen(navController: NavController, onWisataLoaded: (List<Wisata>) -> Unit = {}){
+    var wisataa by remember { mutableStateOf<List<Wisata>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+    var isError by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        try{
+            wisataa = RetrofitClient.instance.getWisata()
+            onWisataLoaded(wisataa)
+            isLoading = false
+            isError = false
+        } catch (_: Exception) {
+            isLoading = false
+            isError = true
+        }
+    }
+
+    if (isLoading) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    } else if (isError || wisataa.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                items(WisataSource.dummyWisata) { wisata ->
-                    WisataRowItem(wisata = wisata, navController = navController)
-
-                }
+                Text(
+                    text = "Gagal Memuat Data",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Red
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Pastikan koneksi internet Anda menyala",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
-            Spacer(modifier = Modifier.height(45.dp))
-            Text(
-                text = "Daftar Wisata Lengkap",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
         }
-        items(WisataSource.dummyWisata) { wisata ->
-            WisataItem(wisata = wisata, navController = navController)
-        }
+    }
+    else {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding(),
+            contentPadding = PaddingValues(24.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            item {
+                Text(
+                    text = "Rekomendasi Populer",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(wisataa) { wisata ->
+                        WisataRowItem(wisata = wisata, navController = navController)
+                    }
+                }
+                Spacer(modifier = Modifier.height(45.dp))
+                Text(
+                    text = "Daftar Wisata Lengkap",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+            }
 
+            items(wisataa) { wisata ->
+                WisataItem(wisata = wisata, navController = navController)
+            }
+        }
     }
 }
 
 @Composable
 fun WisataRowItem(wisata: Wisata, navController: NavController) {
+//    val context = LocalContext.current
+//    val resId = WisataSource.getResourceId(context, wisata.imageName)
+//    val imageRes = if (resId != 0) resId else R.drawable.gigi_hiu
+
     Card(
         modifier = Modifier
             .width(160.dp)
@@ -150,9 +208,11 @@ fun WisataRowItem(wisata: Wisata, navController: NavController) {
         )
     ) {
         Column {
-            Image(
-                painter = painterResource(id = wisata.imageRes),
+            AsyncImage(
+                model = wisata.imageUrl,
                 contentDescription = wisata.nama,
+                placeholder = painterResource(id = R.drawable.gigi_hiu),
+                error = painterResource(id = R.drawable.way_kambas),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(100.dp),
@@ -167,7 +227,7 @@ fun WisataRowItem(wisata: Wisata, navController: NavController) {
                 Text(
                     text = "Rp ${wisata.hargaTiketAwal} - ${wisata.hargaTiketAkhir}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary
+                    color = Color(0xFFFF2D2D)
                 )
             }
         }
@@ -180,6 +240,10 @@ fun DetailScreen(wisata: Wisata, navController: NavController, isFullScreen: Boo
     var isLoading by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+//    val context = LocalContext.current
+//    val resId = WisataSource.getResourceId(context, wisata.imageUrl)
+//    val imageRes = if (resId != 0) resId else R.drawable.gigi_hiu
+
 
     Box(modifier = Modifier.fillMaxWidth()) {
         Card(
@@ -196,17 +260,22 @@ fun DetailScreen(wisata: Wisata, navController: NavController, isFullScreen: Boo
                     .padding(16.dp)
             ) {
                 Box {
-                    Image(
-                        painter = painterResource(id = wisata.imageRes),
+                    AsyncImage(
+                        model = wisata.imageUrl,
                         contentDescription = wisata.nama,
+                        placeholder = painterResource(id = R.drawable.gigi_hiu),
+                        error = painterResource(id = R.drawable.way_kambas),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp),
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(12.dp)),
                         contentScale = ContentScale.Crop
                     )
                     IconButton(
                         onClick = { isFavorite = !isFavorite },
-                        modifier = Modifier.align(Alignment.TopEnd)
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
                     ) {
                         Icon(
                             imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
@@ -224,12 +293,14 @@ fun DetailScreen(wisata: Wisata, navController: NavController, isFullScreen: Boo
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    text = wisata.deskripsi,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Justify,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+                if (isFullScreen) {
+                    Text(
+                        text = wisata.deskripsi,
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Justify,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
@@ -295,7 +366,7 @@ fun DetailScreen(wisata: Wisata, navController: NavController, isFullScreen: Boo
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(if (isFullScreen) "Kembali" else "Pesan")
+                    Text(if (isFullScreen) "Kembali" else "Lihat Detail")
                 }
             }
         }
@@ -308,32 +379,10 @@ fun DetailScreen(wisata: Wisata, navController: NavController, isFullScreen: Boo
 
 @Composable
 fun WisataItem(wisata: Wisata, navController: NavController) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { navController.navigate("detail/${wisata.nama}") }
-            .padding(8.dp),
-        shape = RoundedCornerShape(12.dp),
-    ) {
-        Row(modifier = Modifier.padding(16.dp)) {
-            Image(
-                painter = painterResource(id = wisata.imageRes),
-                contentDescription = wisata.nama,
-                modifier = Modifier.size(80.dp)
-            )
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column {
-                Text(
-                    text = wisata.nama,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(text = "Rp ${wisata.hargaTiketAwal} - ${wisata.hargaTiketAkhir}")
-                Text(text = "Klik untuk selengkapnya")
-            }
-        }
-    }
+    DetailScreen(wisata = wisata,
+        navController = navController,
+        isFullScreen = false
+    )
 }
 
 @Preview(showBackground = true)
