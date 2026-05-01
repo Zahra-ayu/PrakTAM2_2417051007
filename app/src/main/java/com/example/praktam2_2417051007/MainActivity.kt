@@ -227,7 +227,7 @@ fun WisataRowItem(wisata: Wisata, navController: NavController) {
                 Text(
                     text = "Rp ${wisata.hargaTiketAwal} - ${wisata.hargaTiketAkhir}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFFFF2B2B)
+                    color = Color(0xFFFF3030)
                 )
             }
         }
