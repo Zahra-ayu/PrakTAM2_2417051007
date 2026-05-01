@@ -4,8 +4,8 @@ import androidx.compose.ui.graphics.Color
 
 val Pink40 = Color(0xFF7D5260)
 
-val OrangePrimary = Color(0xFFE65100)
-val OrangeSecondary = Color(0xFFFFA726)
-val CreamBackground = Color(0xFFFFF8F1)
+val BluePrimary = Color(0xFF001972)
+val BlueSecondary = Color(0xFF2655FF)
+val IceBackground = Color(0xFFF1F8FF)
 val CardSurface = Color(0xFFFFFFFF)
 val OnPrimaryText = Color(0xFFFFFFFF)
