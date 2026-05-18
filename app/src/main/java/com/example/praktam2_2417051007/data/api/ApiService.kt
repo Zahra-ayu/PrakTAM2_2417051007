@@ -1,5 +1,6 @@
-package com.example.praktam2_2417051007.network
-import com.example.praktam2_2417051007.model.Wisata
+package com.example.praktam2_2417051007.data.api
+
+import com.example.praktam2_2417051007.data.model.Wisata
 import retrofit2.http.GET
 
 interface ApiService {

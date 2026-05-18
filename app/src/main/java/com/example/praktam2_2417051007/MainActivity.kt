@@ -55,15 +55,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.draw.clip
-import com.example.praktam2_2417051007.network.RetrofitClient
+import com.example.praktam2_2417051007.data.api.RetrofitClient
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.praktam2_2417051007.ui.theme.PrakTAM2_2417051007Theme
-import com.example.praktam2_2417051007.model.Wisata
+import com.example.praktam2_2417051007.data.model.Wisata
 import coil.compose.AsyncImage
+import com.example.praktam2_2417051007.data.repository.WisataRepository
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -110,16 +111,14 @@ fun DaftarWisataScreen(navController: NavController, onWisataLoaded: (List<Wisat
     var isLoading by remember { mutableStateOf(true) }
     var isError by remember { mutableStateOf(false) }
 
+    val repository = remember { WisataRepository() }
+
     LaunchedEffect(Unit) {
-        try{
-            wisataa = RetrofitClient.instance.getWisata()
-            onWisataLoaded(wisataa)
-            isLoading = false
-            isError = false
-        } catch (_: Exception) {
-            isLoading = false
-            isError = true
-        }
+        isLoading = true
+        wisataa = repository.getWisata()
+        onWisataLoaded(wisataa)
+        isLoading = false
+        isError = wisataa.isEmpty()
     }
 
     if (isLoading) {
