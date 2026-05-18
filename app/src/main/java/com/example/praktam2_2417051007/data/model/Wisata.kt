@@ -1,4 +1,5 @@
-package com.example.praktam2_2417051007.model
+package com.example.praktam2_2417051007.data.model
+
 import com.google.gson.annotations.SerializedName
 
 data class Wisata(
